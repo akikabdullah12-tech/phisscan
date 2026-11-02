@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Thank you{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<div class="hero">
+  <div class="hero-icon">{{ ui.ok(64) }}</div>
+  <h1>Thank you</h1>
+  <p class="lead">Your participation is complete and your research session has been closed.</p>
+  <p>Your anonymous participant ID was <span class="code">{{ finished_id }}</span>. Keep it if you may wish to withdraw your data.</p>
+  <div class="actions" ><a class="btn btn-secondary" href="{{ url_for('participant.index') }}">Return to the welcome page</a></div>
+</div>
+{% endblock %}

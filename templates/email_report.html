@@ -1,0 +1,117 @@
+{# Email scan report. All values are auto-escaped by Jinja; the pasted email is
+   never rendered as HTML. Embedded links are listed as text, never as <a> tags. #}
+{% extends "base.html" %}
+{% block title %}Email Analysis Report{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<h1>PhisScan Email Analysis Report</h1>
+<p class="muted mt-0">Email phishing analysis</p>
+
+<div class="verdict {{ 'verdict-phishing' if r.is_phishing else 'verdict-legit' }}" role="status">
+  <div class="verdict-icon">{{ ui.warn(44) if r.is_phishing else ui.ok(44) }}</div>
+  <div>
+    <p class="verdict-title">{{ 'Potential Phishing' if r.is_phishing else 'No Phishing Pattern Detected' }}</p>
+    <div>Model probability: <strong>{{ r.probability|prob }}</strong> &middot; decided by {{ r.model_name }}</div>
+    {% if r.agreement and r.agreement.total %}<div class="small">{{ r.agreement.phishing }} of {{ r.agreement.total }} algorithms flagged this email</div>{% endif %}
+    <div class="prob-bar" aria-hidden="true"><div class="prob-fill {{ r.probability|wclass }}"></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Results from every algorithm</h2>
+  {{ ui.all_models_table(r.all_models, r.agreement) }}
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Report information</h2>
+  <dl class="kv">
+    <dt>Scan ID</dt><dd>{{ r.scan_id }}</dd>
+    <dt>Scan type</dt><dd>Email</dd>
+    <dt>Date and time</dt><dd>{{ r.timestamp }}</dd>
+    <dt>Email subject</dt><dd>{{ r.subject or '(none provided)' }}</dd>
+    <dt>Sender</dt><dd>{{ r.sender or '(none provided)' }}</dd>
+    <dt>Prediction</dt><dd><span class="badge {{ 'badge-phishing' if r.is_phishing else 'badge-legit' }}">{{ r.prediction }}</span></dd>
+    <dt>Model</dt><dd>{{ r.model_name }} with TF-IDF text features <span class="muted small">({{ r.model_version }})</span></dd>
+  </dl>
+  <p class="small muted">The probability comes from a calibrated model trained on a labelled email dataset. It is an estimate, not a guarantee.
+  {% if r.quick_mode %}<strong>Note: this model was trained in quick test mode.</strong>{% endif %}</p>
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Detected indicators</h2>
+  <p class="small muted">Rule-based checks for common phishing tactics. Legitimate emails can contain the same words, so these are prompts for caution rather than evidence.</p>
+  {% if r.rule_indicators %}
+    {{ ui.indicator_list(r.rule_indicators) }}
+  {% else %}
+    <p>No common phishing tactics were found by the rule-based checks.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Words that influenced the model</h2>
+  <p class="small muted">Model-derived explanation: {% if r.explanation_signed %}terms in this email that pushed the model's score towards phishing the most.{% else %}terms in this email that the model treats as most important (direction not available for this model type).{% endif %}</p>
+  {% if r.model_explanation %}
+    <div class="examples">{% for t in r.model_explanation %}<span class="badge badge-blue">{{ t.term }}</span>{% endfor %}</div>
+  {% else %}
+    <p>No individual terms stood out; the result reflects the message as a whole.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Embedded URL analysis</h2>
+  {% if r.urls %}
+    <p class="small muted">Each link found in the message was analysed separately with the URL model. Links were not opened.</p>
+    {% for u in r.urls %}
+    <div class="url-item">
+      <div class="url-item-head">
+        <span class="small muted">Embedded URL found</span>
+        {% if u.prediction == 'Phishing' %}<span class="badge badge-phishing">Potential Phishing &middot; {{ u.probability|prob }}</span>
+        {% elif u.prediction == 'Legitimate' %}<span class="badge badge-legit">No phishing pattern &middot; {{ u.probability|prob }}</span>
+        {% else %}<span class="badge badge-neutral">{{ u.prediction }}</span>{% endif %}
+      </div>
+      <div class="code">{{ u.url }}</div>
+      {% if u.error %}<div class="small muted">{{ u.error }}</div>{% endif %}
+      {% if u.agreement %}<div class="small muted">{{ u.agreement.phishing }} of {{ u.agreement.total }} URL algorithms flagged this link.</div>{% endif %}
+      {% if u.indicators %}<div class="small muted">Indicators: {{ u.indicators|join(', ') }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <p>No links were found in this message.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Overall assessment</h2>
+  <p>
+    The email model classified this message as <strong>{{ 'potentially phishing' if r.is_phishing else 'legitimate' }}</strong>
+    ({{ r.probability|prob }}).
+    {% if r.urls %}{{ flagged_urls|length }} of {{ r.urls|length }} embedded link{{ 's' if r.urls|length != 1 }} {{ 'was' if flagged_urls|length == 1 else 'were' }} classified as potentially phishing by the URL model.{% endif %}
+    {{ r.rule_indicators|length }} rule-based indicator{{ 's' if r.rule_indicators|length != 1 }} {{ 'was' if r.rule_indicators|length == 1 else 'were' }} found.
+  </p>
+  {% if r.is_phishing or flagged_urls %}
+    <div class="alert alert-danger mb-0">At least one component raised a warning. Treat this message with caution and verify it through an independent channel before acting on it.</div>
+  {% else %}
+    <div class="alert alert-success mb-0">Neither the email model nor the URL model identified a phishing pattern. This does not guarantee the message is safe.</div>
+  {% endif %}
+  <p class="small muted">The results are shown side by side; PhisScan does not merge them into a single combined score, because no combined method has been evaluated.</p>
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Security awareness</h2>
+  <ul>
+    {% set titles = r.rule_indicators|map(attribute='title')|list %}
+    {% if 'Request for sensitive information' in titles %}<li>Legitimate organisations do not ask for passwords, PINs or full card numbers by email.</li>{% endif %}
+    {% if 'Urgent or time-pressure language' in titles or 'Threatening or alarming language' in titles %}<li>Pressure to act quickly is a common tactic. Pause and check through an official channel.</li>{% endif %}
+    {% if 'Link text does not match its destination' in titles %}<li>The visible text of a link can differ from where it goes. Hover over links (without clicking) to see the real address.</li>{% endif %}
+    {% if 'Organisation name from a free email account' in titles or 'Sender domain imitates a brand' in titles or 'Possible impersonation' in titles %}<li>Check the sender's full address, not just the display name.</li>{% endif %}
+    {% if 'Unexpected reward or prize' in titles %}<li>Unexpected prizes that require you to click a link or give details are almost always scams.</li>{% endif %}
+    <li>If in doubt, contact the organisation using contact details you already trust, and report suspicious emails (in the UK: <span class="code">report@phishing.gov.uk</span>).</li>
+  </ul>
+</div>
+
+<div class="actions">
+  <a class="btn btn-secondary" href="{{ url_for('detection.dashboard') }}">Back to Dashboard</a>
+  <a class="btn btn-secondary" href="{{ url_for('detection.dashboard', tab='email') }}">Analyse Another Email</a>
+  <a class="btn btn-primary" href="{{ url_for('participant.debrief') }}">Finish Session</a>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{# URL scan report. The model's prediction, the rule-based indicators and the
+   model explanation are deliberately kept in separate cards so participants
+   can tell "what the model thinks" apart from "general warning signs". #}
+{% extends "base.html" %}
+{% block title %}URL Analysis Report{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<h1>PhisScan URL Analysis Report</h1>
+<p class="muted mt-0">Scan report</p>
+
+<div class="verdict {{ 'verdict-phishing' if r.is_phishing else 'verdict-legit' }}" role="status">
+  <div class="verdict-icon">{{ ui.warn(44) if r.is_phishing else ui.ok(44) }}</div>
+  <div>
+    <p class="verdict-title">{{ 'Phishing Detected' if r.is_phishing else 'No Phishing Pattern Detected' }}</p>
+    <div>Estimated phishing probability: <strong>{{ r.probability|prob }}</strong> &middot; decided by {{ r.model_name }}</div>
+    {% if r.agreement and r.agreement.total %}<div class="small">{{ r.agreement.phishing }} of {{ r.agreement.total }} algorithms flagged this URL</div>{% endif %}
+    <div class="prob-bar" aria-hidden="true"><div class="prob-fill {{ r.probability|wclass }}"></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Results from every algorithm</h2>
+  {{ ui.all_models_table(r.all_models, r.agreement) }}
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Report information</h2>
+  <dl class="kv">
+    <dt>Scan ID</dt><dd>{{ r.scan_id }}</dd>
+    <dt>Scan type</dt><dd>{{ r.scan_type }}</dd>
+    <dt>Date and time</dt><dd>{{ r.timestamp }}</dd>
+    <dt>Submitted URL</dt><dd><span class="code">{{ r.url }}</span></dd>
+    <dt>Hostname</dt><dd>{{ r.hostname }}</dd>
+    <dt>Registered domain</dt><dd>{{ r.registered_domain }}</dd>
+    <dt>Prediction</dt><dd><span class="badge {{ 'badge-phishing' if r.is_phishing else 'badge-legit' }}">{{ r.prediction }}</span></dd>
+    <dt>Model</dt><dd>{{ r.model_name }} <span class="muted small">({{ r.model_version }})</span></dd>
+  </dl>
+  <p class="small muted">The probability is the model's estimated likelihood based on patterns in its training data. It is not a guarantee.
+    The model analyses characteristics of the domain name only; the website itself was not visited.
+    {% if r.quick_mode %}<strong>Note: this model was trained in quick test mode.</strong>{% endif %}</p>
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Security indicators found in this URL</h2>
+  <p class="small muted">Rule-based checks: general warning signs that are present in this URL. They are shown separately from the machine-learning prediction, and a single indicator is not proof of phishing.</p>
+  {% if r.rule_indicators %}
+    {{ ui.indicator_list(r.rule_indicators) }}
+  {% else %}
+    <p>No common warning signs were found by the rule-based checks.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2 class="mt-0">What influenced the model</h2>
+  <p class="small muted">Model-derived explanation: each characteristic was compared with a typical legitimate domain to see how much it changed the model's estimate.</p>
+  {% if r.model_explanation %}
+    {% for e in r.model_explanation %}
+    <div class="explain-row">
+      <div>{{ e.description }}<div class="small muted">This URL: {{ '%g'|format(e.value|round(2)) }} &middot; typical legitimate: {{ '%g'|format(e.typical_legitimate_value|round(2)) }}</div></div>
+      <div class="{{ 'effect-up' if e.effect > 0 else 'effect-down' }}">{{ '+' if e.effect > 0 }}{{ (e.effect * 100)|round(0)|int }} pts {{ 'towards phishing' if e.effect > 0 else 'towards legitimate' }}</div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p>No single characteristic changed the estimate noticeably; the result reflects the overall pattern.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Security recommendations</h2>
+  {% if r.is_phishing %}
+    <ul>
+      <li>Do not enter passwords or financial information until the website's authenticity has been independently verified.</li>
+      <li>Reach the organisation by typing its known address yourself or using its official app, rather than following this link.</li>
+      <li>If you received this link in a message, report it (for example to your IT team or <span class="code">report@phishing.gov.uk</span> in the UK).</li>
+    </ul>
+  {% else %}
+    <p>No phishing pattern was identified by the selected model. This prediction does not guarantee that the website is safe.</p>
+    <ul>
+      <li>Still check that the address is exactly the one you expect before signing in.</li>
+      <li>Be cautious if the link arrived unexpectedly or asks for personal or payment details.</li>
+    </ul>
+  {% endif %}
+</div>
+
+<div class="actions">
+  <a class="btn btn-secondary" href="{{ url_for('detection.dashboard') }}">Back to Dashboard</a>
+  <a class="btn btn-secondary" href="{{ url_for('detection.dashboard', tab='url') }}">Scan Another URL</a>
+  <a class="btn btn-primary" href="{{ url_for('participant.debrief') }}">Finish Session</a>
+</div>
+{% endblock %}

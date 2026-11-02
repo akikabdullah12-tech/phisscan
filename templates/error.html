@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Error{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{{ 'Page not found' if code == 404 else 'Something went wrong' }}</h1>
+  <p>{{ message }}</p>
+  <div class="actions">
+    <a class="btn btn-primary" href="{{ url_for('detection.dashboard') if is_participant else url_for('participant.index') }}">{{ 'Back to Dashboard' if is_participant else 'Go to the welcome page' }}</a>
+  </div>
+  <p class="small muted">Error code {{ code }}</p>
+</div>
+{% endblock %}

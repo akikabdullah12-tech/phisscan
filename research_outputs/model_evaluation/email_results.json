@@ -1,0 +1,368 @@
+{
+  "task": "email",
+  "dataset": {
+    "file": "Phishing_Email.csv",
+    "rows_loaded": 18650,
+    "after_dropping_empty": 18630,
+    "conflicting_texts_dropped": 1,
+    "rows_after_cleaning": 17092,
+    "phishing_rows": 6425,
+    "legitimate_rows": 10667
+  },
+  "split": {
+    "train": 13673,
+    "test": 3419,
+    "cv_folds": 3,
+    "test_size": 0.2,
+    "random_state": 42
+  },
+  "vectorizer": {
+    "type": "TF-IDF",
+    "max_features": 20000,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_df": 0.95,
+    "sublinear_tf": true,
+    "vocabulary_size": 20000
+  },
+  "selected_model": "Support Vector Machine",
+  "selection_rule": "Highest mean cross-validation F1 among models with mean CV false-positive rate <= 5% (ties broken by CV phishing recall). Test-set results were not used for selection.",
+  "model_version": "email-support_vector_machine-202610302040",
+  "trained_at": "2026-10-30 20:40 UTC",
+  "skipped_models": [
+    "XGBoost (package not installed: pip install xgboost)"
+  ],
+  "top_phishing_terms": [
+    {
+      "term": "click",
+      "weight": 2.229078452518368,
+      "signed": true
+    },
+    {
+      "term": "http",
+      "weight": 1.9684788089063847,
+      "signed": true
+    },
+    {
+      "term": "remove",
+      "weight": 1.5964878757927756,
+      "signed": true
+    },
+    {
+      "term": "money",
+      "weight": 1.3820042741334173,
+      "signed": true
+    },
+    {
+      "term": "free",
+      "weight": 1.3736728593399194,
+      "signed": true
+    },
+    {
+      "term": "life",
+      "weight": 1.323796637641238,
+      "signed": true
+    },
+    {
+      "term": "hello",
+      "weight": 1.249901248974286,
+      "signed": true
+    },
+    {
+      "term": "software",
+      "weight": 1.1793409324390205,
+      "signed": true
+    },
+    {
+      "term": "email",
+      "weight": 1.1792806469343875,
+      "signed": true
+    },
+    {
+      "term": "spamassassin sightings",
+      "weight": 1.1729642061537957,
+      "signed": true
+    },
+    {
+      "term": "urltoken emailtoken",
+      "weight": 1.1660691702676764,
+      "signed": true
+    },
+    {
+      "term": "reply",
+      "weight": 1.1654254596302303,
+      "signed": true
+    },
+    {
+      "term": "phone mobile",
+      "weight": 1.1554850844320634,
+      "signed": true
+    },
+    {
+      "term": "sightings mailing",
+      "weight": 1.1532796919051784,
+      "signed": true
+    },
+    {
+      "term": "mobile email",
+      "weight": 1.1472821408408473,
+      "signed": true
+    },
+    {
+      "term": "investment",
+      "weight": 1.1293326764588965,
+      "signed": true
+    },
+    {
+      "term": "site",
+      "weight": 1.101560939985702,
+      "signed": true
+    },
+    {
+      "term": "offer",
+      "weight": 1.1013056244809327,
+      "signed": true
+    },
+    {
+      "term": "sightings",
+      "weight": 1.0667171425710784,
+      "signed": true
+    },
+    {
+      "term": "viagra",
+      "weight": 1.061213668203831,
+      "signed": true
+    },
+    {
+      "term": "goodbye",
+      "weight": 1.0221605696176823,
+      "signed": true
+    },
+    {
+      "term": "watch",
+      "weight": 1.019686183916706,
+      "signed": true
+    },
+    {
+      "term": "mortgage",
+      "weight": 1.0188851084271018,
+      "signed": true
+    },
+    {
+      "term": "learn",
+      "weight": 1.0161880589973549,
+      "signed": true
+    },
+    {
+      "term": "quality",
+      "weight": 1.0151258256604034,
+      "signed": true
+    }
+  ],
+  "plots": [
+    "email_confusion_matrices.png",
+    "email_roc_curves.png",
+    "email_pr_curves.png"
+  ],
+  "quick_mode": false,
+  "sklearn_version": "1.9.1",
+  "models": [
+    {
+      "model": "Logistic Regression",
+      "best_params": {
+        "clf__C": 10.0
+      },
+      "cv_f1_mean": 0.973279509322282,
+      "cv_f1_std": 0.002351528856828273,
+      "cv_recall_mean": 0.967509876540687,
+      "cv_precision_mean": 0.9791441809951555,
+      "cv_fpr_mean": 0.012422333124875893,
+      "accuracy": 0.9847908745247148,
+      "precision": 0.9873517786561264,
+      "recall": 0.9719844357976654,
+      "f1": 0.9796078431372549,
+      "false_positive_rate": 0.007497656982193065,
+      "false_negative_rate": 0.02801556420233463,
+      "confusion_matrix": [
+        [
+          2118,
+          16
+        ],
+        [
+          36,
+          1249
+        ]
+      ],
+      "roc_auc": 0.9984636367283084,
+      "pr_auc": 0.9976828716067166,
+      "tuning_seconds": 71.74,
+      "final_fit_seconds": 8.41
+    },
+    {
+      "model": "Decision Tree",
+      "best_params": {
+        "clf__max_depth": null,
+        "clf__min_samples_leaf": 1
+      },
+      "cv_f1_mean": 0.8938393839334834,
+      "cv_f1_std": 0.00312117444012591,
+      "cv_recall_mean": 0.9075870496804925,
+      "cv_precision_mean": 0.8805349275960127,
+      "cv_fpr_mean": 0.07418266968888756,
+      "accuracy": 0.9271716876279614,
+      "precision": 0.8900602409638554,
+      "recall": 0.9198443579766536,
+      "f1": 0.904707233065442,
+      "false_positive_rate": 0.06841611996251172,
+      "false_negative_rate": 0.08015564202334631,
+      "confusion_matrix": [
+        [
+          1988,
+          146
+        ],
+        [
+          103,
+          1182
+        ]
+      ],
+      "roc_auc": 0.925714119007071,
+      "pr_auc": 0.8488426586782964,
+      "tuning_seconds": 125.87,
+      "final_fit_seconds": 12.57
+    },
+    {
+      "model": "Random Forest",
+      "best_params": {
+        "clf__max_depth": null,
+        "clf__min_samples_leaf": 1
+      },
+      "cv_f1_mean": 0.95791046223937,
+      "cv_f1_std": 0.0010156480961247057,
+      "cv_recall_mean": 0.9675093088907826,
+      "cv_precision_mean": 0.9485061770087864,
+      "cv_fpr_mean": 0.03164194427347639,
+      "accuracy": 0.973091547236034,
+      "precision": 0.9563886763580719,
+      "recall": 0.9727626459143969,
+      "f1": 0.9645061728395061,
+      "false_positive_rate": 0.026710402999062792,
+      "false_negative_rate": 0.027237354085603113,
+      "confusion_matrix": [
+        [
+          2077,
+          57
+        ],
+        [
+          35,
+          1250
+        ]
+      ],
+      "roc_auc": 0.9954560041426741,
+      "pr_auc": 0.9895303908392585,
+      "tuning_seconds": 110.04,
+      "final_fit_seconds": 24.07
+    },
+    {
+      "model": "Support Vector Machine",
+      "best_params": {
+        "clf__estimator__C": 1.0
+      },
+      "cv_f1_mean": 0.9743370603544858,
+      "cv_f1_std": 0.0009558006646006304,
+      "cv_recall_mean": 0.9714008895755182,
+      "cv_precision_mean": 0.97730903843193,
+      "cv_fpr_mean": 0.013594391258959344,
+      "accuracy": 0.986838256800234,
+      "precision": 0.9889589905362776,
+      "recall": 0.9758754863813229,
+      "f1": 0.982373678025852,
+      "false_positive_rate": 0.006560449859418931,
+      "false_negative_rate": 0.024124513618677044,
+      "confusion_matrix": [
+        [
+          2120,
+          14
+        ],
+        [
+          31,
+          1254
+        ]
+      ],
+      "roc_auc": 0.9985949186599032,
+      "pr_auc": 0.9978499098280136,
+      "tuning_seconds": 51.53,
+      "final_fit_seconds": 8.29
+    },
+    {
+      "model": "Multinomial Naive Bayes",
+      "best_params": {
+        "clf__alpha": 0.5
+      },
+      "cv_f1_mean": 0.9591526229132512,
+      "cv_f1_std": 0.0025174915086551754,
+      "cv_recall_mean": 0.938715608079066,
+      "cv_precision_mean": 0.9805057452904196,
+      "cv_fpr_mean": 0.011250027808057663,
+      "accuracy": 0.9716291313249488,
+      "precision": 0.9821428571428571,
+      "recall": 0.9416342412451362,
+      "f1": 0.9614620580055622,
+      "false_positive_rate": 0.010309278350515464,
+      "false_negative_rate": 0.058365758754863814,
+      "confusion_matrix": [
+        [
+          2112,
+          22
+        ],
+        [
+          75,
+          1210
+        ]
+      ],
+      "roc_auc": 0.9976380192473899,
+      "pr_auc": 0.9961748107375452,
+      "tuning_seconds": 94.97,
+      "final_fit_seconds": 8.36
+    },
+    {
+      "model": "Soft-Voting Ensemble",
+      "best_params": {
+        "members": [
+          "Logistic Regression",
+          "Decision Tree",
+          "Random Forest",
+          "Support Vector Machine"
+        ],
+        "voting": "soft (mean probability)"
+      },
+      "cv_f1_mean": 0.9693949218717558,
+      "cv_f1_std": 0.0024133439060639583,
+      "cv_recall_mean": 0.9737349524525087,
+      "cv_precision_mean": 0.9651079814409987,
+      "cv_fpr_mean": 0.021211780399562657,
+      "accuracy": 0.9836209417958467,
+      "precision": 0.9797033567525371,
+      "recall": 0.9766536964980544,
+      "f1": 0.9781761496492596,
+      "false_positive_rate": 0.01218369259606373,
+      "false_negative_rate": 0.023346303501945526,
+      "confusion_matrix": [
+        [
+          2108,
+          26
+        ],
+        [
+          30,
+          1255
+        ]
+      ],
+      "roc_auc": 0.9976690163701275,
+      "pr_auc": 0.996553923435285,
+      "tuning_seconds": 0.0,
+      "final_fit_seconds": 0.0
+    }
+  ]
+}

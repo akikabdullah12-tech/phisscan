@@ -1,0 +1,48 @@
+{% macro shield(size=28) -%}
+<svg width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+{%- endmacro %}
+{% macro warn(size=40) -%}
+<svg width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg>
+{%- endmacro %}
+{% macro ok(size=40) -%}
+<svg width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+{%- endmacro %}
+
+{% macro flashes() -%}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ {'success':'success','warning':'warning','danger':'danger'}.get(category, 'info') }}" role="status">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+{%- endmacro %}
+
+{% macro indicator_list(items) -%}
+  {% for i in items %}
+    <div class="indicator {{ i.level }}">
+      <div class="indicator-title">{{ i.title }}</div>
+      <p>{{ i.detail }}</p>
+    </div>
+  {% endfor %}
+{%- endmacro %}
+
+{# Side-by-side verdicts from every algorithm. Used by both report pages. #}
+{% macro all_models_table(rows, agreement) -%}
+  {% if rows %}
+  <p class="mt-0"><strong>{{ agreement.phishing }} of {{ agreement.total }}</strong> algorithms classified this as phishing{% if agreement.phishing and agreement.legitimate %}; {{ agreement.legitimate }} classified it as legitimate{% endif %}.</p>
+  <div class="model-table">
+    {% for m in rows %}
+    <div class="model-row {{ 'model-row-selected' if m.selected }} {{ 'model-row-ensemble' if m.is_ensemble }}">
+      <div class="model-name">{{ m.model }}{% if m.selected %} <span class="badge badge-blue">used for the verdict</span>{% endif %}</div>
+      <div class="model-verdict"><span class="badge {{ 'badge-phishing' if m.is_phishing else 'badge-legit' }}">{{ 'Phishing' if m.is_phishing else 'Legitimate' }}</span></div>
+      <div class="model-prob">
+        <span>{{ m.probability|prob }}</span>
+        <div class="prob-bar small-bar" aria-hidden="true"><div class="prob-fill {{ 'fill-phishing' if m.is_phishing else 'fill-legit' }} {{ m.probability|wclass }}"></div></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="small muted">All algorithms analysed the same input. The soft-voting ensemble averages the individual probabilities. Each algorithm's test-set performance is on the research results; disagreement between them is a sign the case is harder to call.</p>
+  {% else %}
+  <p class="muted">Individual algorithm results are not available for this model version. Retrain the models to enable this table.</p>
+  {% endif %}
+{%- endmacro %}

@@ -1,0 +1,48 @@
+{# Shared layout. The participant navigation only appears after consent, and the
+   admin pages override the nav block with their own menu (_admin_base.html). #}
+{% import "_macros.html" as ui %}
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PhisScan{% endblock %} · PhisScan</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner container">
+    <a class="brand" href="{{ url_for('detection.dashboard') if is_participant else url_for('participant.index') }}">
+      <span class="hero-icon">{{ ui.shield(30) }}</span>
+      <span><span class="brand-name">PhisScan</span><span class="brand-sub">Machine Learning-Based Phishing Detection System</span></span>
+    </a>
+    {% block nav %}
+    {% if is_participant %}
+    {% set ep = request.endpoint %}
+    {% set tab = active|default('') %}
+    <nav class="nav" aria-label="Main">
+      <a href="{{ url_for('detection.dashboard') }}" data-tab="home" class="{{ 'active' if ep == 'detection.dashboard' and tab in ('', 'home') }}">Home</a>
+      <a href="{{ url_for('detection.dashboard', tab='url') }}" data-tab="url" class="{{ 'active' if tab == 'url' or ep == 'detection.url_report' }}">URL Detection</a>
+      <a href="{{ url_for('detection.dashboard', tab='email') }}" data-tab="email" class="{{ 'active' if tab == 'email' or ep == 'detection.email_report' }}">Email Detection</a>
+      <a href="{{ url_for('participant.awareness') }}" class="{{ 'active' if ep == 'participant.awareness' }}">Security Awareness</a>
+    </nav>
+    {% endif %}
+    {% endblock %}
+  </div>
+</header>
+
+<main>
+  <div class="container {% block container_class %}{% endblock %}">
+    {{ ui.flashes() }}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+{% if participant_id %}
+<footer class="site-footer">
+  <div class="container">Your anonymous participant ID: <strong>{{ participant_id }}</strong></div>
+</footer>
+{% endif %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

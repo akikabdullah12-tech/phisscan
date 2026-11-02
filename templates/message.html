@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{{ heading }}</h1>
+  {% for p in body %}<p>{{ p }}</p>{% endfor %}
+  <div class="actions">
+    {% if back_to_dashboard %}<a class="btn btn-primary" href="{{ url_for('detection.dashboard') }}">Back to Dashboard</a>
+    {% else %}<a class="btn btn-secondary" href="{{ url_for('participant.index') }}">Return to the welcome page</a>{% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Research debriefing{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<h1>PhisScan Research Debriefing</h1>
+<div class="card">
+  <p>Thank you for participating in this research.</p>
+  <p>This study investigates how machine learning-based phishing detection tools can support users in identifying potentially deceptive URLs and emails.</p>
+  <p>During this demonstration, you interacted with a prototype designed to classify submitted information as phishing or legitimate.</p>
+  <p>The application also provided explanations and cybersecurity advice to help users understand potential phishing indicators.</p>
+  <p>Machine learning systems are not always accurate. A legitimate-looking URL or email may still contain security risks, and legitimate content may occasionally be classified as suspicious.</p>
+  <p>The purpose of PhisScan is to support cybersecurity awareness and decision-making rather than replace independent security verification.</p>
+  <p>The anonymous usage statistics from your session will contribute to the evaluation of the prototype.</p>
+  <p class="mb-0">Thank you for contributing to this academic research.</p>
+</div>
+
+<div class="section-grey">
+  <p class="mt-0"><strong>Your anonymous participant ID:</strong> <span class="code">{{ participant_id }}</span></p>
+  <p class="small mb-0">Please note this ID if you might want to withdraw your data later. {{ withdrawal_info }}
+  {% if researcher_contact %}Contact: {{ researcher_contact }}.{% endif %}</p>
+</div>
+
+
+<form method="post" action="{{ url_for('participant.finish') }}" data-once>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="actions"><button type="submit" class="btn btn-primary btn-lg">Finish Experience</button></div>
+</form>
+{% endblock %}

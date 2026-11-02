@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Administrator login{% endblock %}
+{% block nav %}{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>PhisScan Administrator Login</h1>
+  <p class="muted small">Restricted area for the researcher. Participant data is only accessible after authentication.</p>
+  {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" action="{{ url_for('admin.login') }}" data-once>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" autocomplete="username" maxlength="64" required autofocus>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" maxlength="256" required>
+    <div class="actions"><button type="submit" class="btn btn-primary" data-busy="Signing in…">Login</button></div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,241 @@
+{
+  "task": "url",
+  "feature_set": "full",
+  "feature_names": [
+    "domain_length",
+    "domain_label_length",
+    "num_hyphens_domain",
+    "num_digits_domain",
+    "digit_ratio_domain",
+    "domain_entropy",
+    "max_consonant_run",
+    "vowel_ratio_domain",
+    "tld_length",
+    "suspicious_tld",
+    "suspicious_keywords_domain",
+    "has_ip",
+    "has_punycode",
+    "is_shortener",
+    "free_hosting",
+    "brand_in_host_mismatch",
+    "host_length",
+    "num_dots",
+    "num_subdomains",
+    "url_length",
+    "path_length",
+    "query_length",
+    "num_slashes",
+    "num_special_chars",
+    "num_at",
+    "num_equals",
+    "num_qmark",
+    "num_ampersand",
+    "num_percent_encoded",
+    "num_digits_url",
+    "num_hyphens_url",
+    "url_entropy",
+    "is_https",
+    "has_www",
+    "has_port",
+    "double_slash_in_path",
+    "suspicious_keywords_url"
+  ],
+  "dataset": {
+    "file": "PhiUSIIL_Phishing_URL_Dataset.csv",
+    "rows_loaded": 235795,
+    "after_exact_url_dedup": 235370,
+    "invalid_urls_dropped": 8,
+    "conflicting_keys_dropped": 0,
+    "rows_after_cleaning": 235362,
+    "phishing_rows": 100512,
+    "legitimate_rows": 134850
+  },
+  "split": {
+    "train": 188289,
+    "test": 47073,
+    "cv_tuning_sample": 40000,
+    "cv_folds": 3,
+    "test_size": 0.2,
+    "random_state": 42
+  },
+  "selected_model": "Soft-Voting Ensemble",
+  "selection_rule": "Highest mean cross-validation F1 among models with mean CV false-positive rate <= 5% (ties broken by CV phishing recall). Test-set results were not used for selection.",
+  "model_version": "url-soft-voting_ensemble-202610302029",
+  "trained_at": "2026-10-30 20:29 UTC",
+  "skipped_models": [
+    "XGBoost (package not installed: pip install xgboost)"
+  ],
+  "selected_feature_importance": null,
+  "plots": [
+    "url_full_confusion_matrices.png",
+    "url_full_roc_curves.png",
+    "url_full_pr_curves.png"
+  ],
+  "quick_mode": false,
+  "sklearn_version": "1.9.1",
+  "models": [
+    {
+      "model": "Logistic Regression",
+      "best_params": {
+        "clf__C": 10.0
+      },
+      "cv_f1_mean": 0.9978294646423778,
+      "cv_f1_std": 0.0002995580563552721,
+      "cv_recall_mean": 0.9957850368809273,
+      "cv_precision_mean": 0.9998824013604849,
+      "cv_fpr_mean": 8.726574638685884e-05,
+      "accuracy": 0.9982367811696726,
+      "precision": 0.9998501947468291,
+      "recall": 0.9960204944535641,
+      "f1": 0.9979316703630791,
+      "false_positive_rate": 0.00011123470522803115,
+      "false_negative_rate": 0.003979505546435855,
+      "confusion_matrix": [
+        [
+          26967,
+          3
+        ],
+        [
+          80,
+          20023
+        ]
+      ],
+      "roc_auc": 0.9989000464810527,
+      "pr_auc": 0.9991649944044422,
+      "tuning_seconds": 3.0,
+      "final_fit_seconds": 5.06
+    },
+    {
+      "model": "Decision Tree",
+      "best_params": {
+        "clf__max_depth": 10,
+        "clf__min_samples_leaf": 1
+      },
+      "cv_f1_mean": 0.9976544763537444,
+      "cv_f1_std": 0.00025246227856817147,
+      "cv_recall_mean": 0.9960192014986536,
+      "cv_precision_mean": 0.999295298901259,
+      "cv_fpr_mean": 0.0005236173242525326,
+      "accuracy": 0.9982792683704034,
+      "precision": 0.9997503993610224,
+      "recall": 0.9962194697308859,
+      "f1": 0.9979818113865703,
+      "false_positive_rate": 0.0001853911753800519,
+      "false_negative_rate": 0.0037805302691140625,
+      "confusion_matrix": [
+        [
+          26965,
+          5
+        ],
+        [
+          76,
+          20027
+        ]
+      ],
+      "roc_auc": 0.9983555554670237,
+      "pr_auc": 0.9980900028261349,
+      "tuning_seconds": 2.12,
+      "final_fit_seconds": 0.59
+    },
+    {
+      "model": "Random Forest",
+      "best_params": {
+        "clf__max_depth": 25,
+        "clf__min_samples_leaf": 1
+      },
+      "cv_f1_mean": 0.9978592899836564,
+      "cv_f1_std": 0.00014967067346175885,
+      "cv_recall_mean": 0.9960192014986536,
+      "cv_precision_mean": 0.9997062003427463,
+      "cv_fpr_mean": 0.00021816722170856957,
+      "accuracy": 0.9984279735729611,
+      "precision": 0.999800369316764,
+      "recall": 0.9965179326468686,
+      "f1": 0.998156452416542,
+      "false_positive_rate": 0.00014831294030404152,
+      "false_negative_rate": 0.0034820673531313732,
+      "confusion_matrix": [
+        [
+          26966,
+          4
+        ],
+        [
+          70,
+          20033
+        ]
+      ],
+      "roc_auc": 0.9990492336731314,
+      "pr_auc": 0.9992519898501859,
+      "tuning_seconds": 22.36,
+      "final_fit_seconds": 14.65
+    },
+    {
+      "model": "Support Vector Machine",
+      "best_params": {
+        "clf__estimator__C": 0.1
+      },
+      "cv_f1_mean": 0.9977704229305685,
+      "cv_f1_std": 0.00023153936498525622,
+      "cv_recall_mean": 0.995550872263201,
+      "cv_precision_mean": 1.0,
+      "cv_fpr_mean": 0.0,
+      "accuracy": 0.9982155375693073,
+      "precision": 0.9998501872659176,
+      "recall": 0.9959707506342337,
+      "f1": 0.9979066985645934,
+      "false_positive_rate": 0.00011123470522803115,
+      "false_negative_rate": 0.004029249365766304,
+      "confusion_matrix": [
+        [
+          26967,
+          3
+        ],
+        [
+          81,
+          20022
+        ]
+      ],
+      "roc_auc": 0.9987643419481993,
+      "pr_auc": 0.9990916020761866,
+      "tuning_seconds": 4.73,
+      "final_fit_seconds": 3.34
+    },
+    {
+      "model": "Soft-Voting Ensemble",
+      "best_params": {
+        "members": [
+          "Logistic Regression",
+          "Decision Tree",
+          "Random Forest",
+          "Support Vector Machine"
+        ],
+        "voting": "soft (mean probability)"
+      },
+      "cv_f1_mean": 0.9979468407494055,
+      "cv_f1_std": 0.00010997526652098351,
+      "cv_recall_mean": 0.9959021191897904,
+      "cv_precision_mean": 1.0,
+      "cv_fpr_mean": 0.0,
+      "accuracy": 0.9983217555711342,
+      "precision": 0.9998502246630054,
+      "recall": 0.9962194697308859,
+      "f1": 0.9980315451125009,
+      "false_positive_rate": 0.00011123470522803115,
+      "false_negative_rate": 0.0037805302691140625,
+      "confusion_matrix": [
+        [
+          26967,
+          3
+        ],
+        [
+          76,
+          20027
+        ]
+      ],
+      "roc_auc": 0.9990040049768902,
+      "pr_auc": 0.9992186924925592,
+      "tuning_seconds": 0.0,
+      "final_fit_seconds": 0.0
+    }
+  ]
+}

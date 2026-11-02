@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-icon">{{ ui.shield(64) }}</div>
+  <h1>PhisScan</h1>
+  <p class="lead mt-0">Machine Learning-Based Phishing Detection and User Awareness System</p>
+  <dl class="meta-list">
+    <dt>Researcher:</dt><dd>{{ researcher }}</dd>
+    <dt>Prototype Type:</dt><dd>PhisScan Research Demonstration</dd>
+    <dt>University:</dt><dd>{{ university }}</dd>
+  </dl>
+</section>
+
+<div class="card">
+  <h2 class="mt-0">Project Introduction</h2>
+  <p>This research investigates how machine learning can help users identify phishing and legitimate website URLs and email messages while improving cybersecurity awareness.</p>
+  <p>Participants will interact with a demonstration phishing detection system, and review its predictions and security explanations.</p>
+  <p>The system is designed for academic research purposes only. No real phishing websites will be accessed, and participants will not be asked to provide passwords, financial details, or other sensitive personal information.</p>
+  <div class="actions">
+    <a class="btn btn-primary btn-lg" href="{{ url_for('participant.consent') }}">Start Scan</a>
+  </div>
+</div>
+
+<div class="alert alert-info small">
+  <strong>Academic research disclaimer:</strong> PhisScan is a research prototype, not a commercial security product.
+  Its predictions can be wrong and should never replace independent verification.
+</div>
+{% endblock %}

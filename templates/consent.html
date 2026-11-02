@@ -1,0 +1,71 @@
+{# Information sheet and consent form. Wording comes from the approved study
+   documents; withdrawal text and contacts are set in .env. #}
+{% extends "base.html" %}
+{% block title %}Participant information and consent{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<h1>Participant Information and Consent</h1>
+<p class="lead">Please read the information below before deciding whether to take part.</p>
+
+<div class="card">
+  <h2 class="mt-0">Section A: Participant Information</h2>
+  <dl class="kv">
+    <dt>Study title</dt><dd>Machine Learning-Based Phishing Detection and User Awareness System</dd>
+    <dt>Researcher</dt><dd>{{ researcher }}{% if researcher_contact %} ({{ researcher_contact }}){% endif %}</dd>
+    {% if supervisor_contact %}<dt>Supervisor</dt><dd>{{ supervisor_contact }}</dd>{% endif %}
+    <dt>Institution</dt><dd>{{ university }}</dd>
+  </dl>
+
+  <h3>Purpose of the research</h3>
+  <p>This research investigates whether machine learning-based phishing detection tools can help users recognise phishing URLs and emails and support their cybersecurity decision-making.</p>
+
+  <h3>What you will do</h3>
+  <ol>
+    <li>Read the research information.</li>
+    <li>Review the consent statements.</li>
+    <li>Provide consent if you wish to participate.</li>
+    <li>Access the PhisScan demonstration application.</li>
+    <li>Test URL and email phishing detection using supplied simulated examples.</li>
+    <li>Review the detection results and security explanations.</li>
+    <li>Read the research debriefing.</li>
+  </ol>
+
+  <h3>Possible risks or discomfort</h3>
+  <p>Participation involves minimal risk. Some simulated phishing examples may cause minor uncertainty or discomfort. No real malicious websites will be accessed.</p>
+
+  <h3>Privacy and confidentiality</h3>
+  <ul>
+    <li>Participation is voluntary.</li>
+    <li>Please do not enter real passwords, payment details, or sensitive personal information.</li>
+    <li>Anonymous usage statistics (for example, the number of scans and their results) will be stored locally for research analysis.</li>
+    <li>These records are identified only by an anonymous participant ID. Your name, email address or signature are not collected.</li>
+    <li>The URLs and email text you analyse are not stored; only anonymous statistics (for example, that a scan took place and its result) are recorded.</li>
+    <li>Data will be handled according to the approved research protocol and applicable university data protection requirements.</li>
+  </ul>
+
+  <h3>Withdrawal</h3>
+  <p>{{ withdrawal_info }}</p>
+</div>
+
+<form method="post" action="{{ url_for('participant.consent') }}" id="consent-form" class="card" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <h2 class="mt-0">Section B: Consent Checklist</h2>
+  {% for e in errors %}<div class="alert alert-danger" role="alert">{{ e }}</div>{% endfor %}
+  <p class="muted small">Please tick each statement to confirm.</p>
+  <ul class="checklist">
+    {% for key, text in statements %}
+    <li><label class="check"><input type="checkbox" name="consent_{{ key }}" value="yes" data-required {{ 'checked' if key in checked }}> <span>{{ text }}</span></label></li>
+    {% endfor %}
+  </ul>
+  <p class="muted small" id="consent-count" aria-live="polite"></p>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary" id="consent-submit">I Consent and Continue</button>
+  </div>
+</form>
+
+<form method="post" action="{{ url_for('participant.decline') }}" class="center">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <p class="muted small mb-0">Do not wish to take part? You do not need to give a reason.</p>
+  <button type="submit" class="btn btn-link">Decline Participation</button>
+</form>
+{% endblock %}

@@ -1,0 +1,232 @@
+/*
+ * PhisScan stylesheet.
+ *
+ * Hand-written instead of pulling in Bootstrap: the app has to work offline
+ * on a lab machine, and the strict Content-Security-Policy only allows
+ * same-origin styles anyway. The look is kept plain on purpose (white,
+ * light grey, blue actions, red for phishing, green for legitimate), so the
+ * participant's attention stays on the results rather than the decoration.
+ */
+
+:root {
+  --blue: #1f5fbf;
+  --blue-dark: #174a96;
+  --blue-light: #eaf1fb;
+  --red: #b42318;
+  --red-light: #fdecea;
+  --green: #18794e;
+  --green-light: #e7f6ee;
+  --amber: #8a5a00;
+  --amber-light: #fff6e0;
+  --text: #1d2433;
+  --muted: #5b6475;
+  --border: #dde2ea;
+  --grey: #f5f7fa;
+  --white: #ffffff;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 16px; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background: var(--white);
+  line-height: 1.55;
+}
+
+a { color: var(--blue); }
+a:hover { color: var(--blue-dark); }
+:focus-visible { outline: 3px solid #8fb4ee; outline-offset: 2px; }
+
+.container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.narrow { max-width: 760px; }
+
+/* Header / navigation */
+.site-header { border-bottom: 1px solid var(--border); background: var(--white); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 14px 20px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.brand-name { font-weight: 700; font-size: 1.25rem; color: var(--blue); }
+.brand-sub { display: block; font-size: 0.8rem; color: var(--muted); }
+.nav { display: flex; flex-wrap: wrap; gap: 4px; }
+.nav a { text-decoration: none; color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 0.95rem; }
+.nav a:hover { background: var(--grey); }
+.nav a.active { background: var(--blue-light); color: var(--blue-dark); font-weight: 600; }
+.nav form { display: inline; }
+
+main { padding: 28px 0 48px; }
+.site-footer { border-top: 1px solid var(--border); background: var(--grey); color: var(--muted); font-size: 0.85rem; padding: 18px 0; }
+
+h1 { font-size: 1.8rem; line-height: 1.25; margin: 0 0 8px; }
+h2 { font-size: 1.35rem; margin: 28px 0 10px; }
+h3 { font-size: 1.1rem; margin: 20px 0 8px; }
+.lead { font-size: 1.08rem; color: var(--muted); }
+.muted { color: var(--muted); }
+.small { font-size: 0.88rem; }
+.center { text-align: center; }
+.mt-0 { margin-top: 0; }
+.mb-0 { margin-bottom: 0; }
+
+/* Cards and sections */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); margin-bottom: 18px; }
+.section-grey { background: var(--grey); border-radius: var(--radius); padding: 20px; margin-bottom: 18px; }
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.stat { background: var(--grey); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.stat-label { font-size: 0.85rem; color: var(--muted); }
+.stat-value { font-size: 1.8rem; font-weight: 700; color: var(--blue-dark); }
+
+/* Hero */
+.hero { text-align: center; padding: 24px 0 8px; }
+.hero-icon { color: var(--blue); }
+.meta-list { display: inline-grid; grid-template-columns: auto auto; gap: 4px 14px; text-align: left; margin: 14px auto; }
+.meta-list dt { color: var(--muted); }
+.meta-list dd { margin: 0; font-weight: 600; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent; border-radius: 8px;
+  padding: 10px 18px; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; line-height: 1.2; min-height: 44px; }
+.btn-primary { background: var(--blue); color: var(--white); }
+.btn-primary:hover { background: var(--blue-dark); color: var(--white); }
+.btn-primary:disabled { background: #9db6dd; cursor: not-allowed; }
+.btn-secondary { background: var(--white); color: var(--blue-dark); border-color: #b9c9e4; }
+.btn-secondary:hover { background: var(--blue-light); }
+.btn-danger { background: var(--white); color: var(--red); border-color: #f1b8b3; }
+.btn-danger:hover { background: var(--red-light); }
+.btn-link { background: none; border: none; color: var(--blue); padding: 8px 12px; font-weight: 400; min-height: auto; cursor: pointer; font-size: 0.95rem; }
+.btn-lg { padding: 13px 26px; font-size: 1.08rem; }
+.btn-sm { padding: 6px 12px; font-size: 0.88rem; min-height: 34px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* Forms */
+label { display: block; font-weight: 600; margin: 14px 0 6px; }
+.hint { font-weight: 400; color: var(--muted); font-size: 0.88rem; }
+input[type="text"], input[type="url"], input[type="email"], input[type="password"], input[type="search"], textarea, select {
+  width: 100%; padding: 11px 13px; border: 1px solid #c4ccd8; border-radius: 10px; font: inherit; color: var(--text); background: var(--white); }
+textarea { min-height: 220px; resize: vertical; font-family: inherit; }
+input:focus, textarea:focus { border-color: var(--blue); outline: 3px solid #cfe0f7; }
+.input-error { border-color: var(--red) !important; }
+.field-error { color: var(--red); font-size: 0.9rem; margin-top: 6px; }
+.inline-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.inline-form input { flex: 1 1 220px; width: auto; }
+
+.checklist { list-style: none; padding: 0; margin: 0; }
+.checklist li { border-bottom: 1px solid var(--border); }
+.checklist li:last-child { border-bottom: none; }
+.check { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; margin: 0; padding: 12px 4px; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--blue); }
+
+/* Alerts */
+.alert { border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; border: 1px solid; }
+.alert-info { background: var(--blue-light); border-color: #c4d7f3; color: #163d79; }
+.alert-success { background: var(--green-light); border-color: #b5e2c9; color: #0f5636; }
+.alert-warning { background: var(--amber-light); border-color: #f1d9a0; color: #6b4600; }
+.alert-danger { background: var(--red-light); border-color: #f4c2bd; color: #8a1a12; }
+
+/* Tabs */
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
+.tab { text-decoration: none; color: var(--muted); padding: 10px 16px; border: 1px solid transparent; border-bottom: none; border-radius: 8px 8px 0 0; font-weight: 600; }
+.tab.active { color: var(--blue-dark); border-color: var(--border); background: var(--white); margin-bottom: -1px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Verdict / report */
+.verdict { border-radius: var(--radius); padding: 20px; border: 1px solid; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.verdict-phishing { background: var(--red-light); border-color: #f4c2bd; }
+.verdict-legit { background: var(--green-light); border-color: #b5e2c9; }
+.verdict-title { font-size: 1.45rem; font-weight: 700; margin: 0; }
+.verdict-phishing .verdict-title { color: var(--red); }
+.verdict-legit .verdict-title { color: var(--green); }
+.verdict-icon { flex: 0 0 auto; }
+.verdict-phishing .verdict-icon { color: var(--red); }
+.verdict-legit .verdict-icon { color: var(--green); }
+.prob-bar { height: 10px; background: #e4e8ee; border-radius: 6px; overflow: hidden; margin-top: 8px; max-width: 360px; }
+.prob-fill { height: 100%; background: var(--blue); }
+.verdict-phishing .prob-fill { background: var(--red); }
+.verdict-legit .prob-fill { background: var(--green); }
+
+.kv { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 8px 16px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92rem; background: var(--grey); border: 1px solid var(--border);
+  border-radius: 6px; padding: 2px 6px; overflow-wrap: anywhere; }
+
+.indicator { border-left: 4px solid var(--amber); background: var(--white); border-radius: 6px; padding: 10px 14px; margin-bottom: 10px; border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.indicator.high { border-left-color: var(--red); }
+.indicator.info { border-left-color: var(--blue); }
+.indicator-title { font-weight: 600; }
+.indicator p { margin: 4px 0 0; color: var(--muted); font-size: 0.93rem; }
+
+.badge { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 0.8rem; font-weight: 600; border: 1px solid; white-space: nowrap; }
+.badge-phishing { background: var(--red-light); color: var(--red); border-color: #f4c2bd; }
+.badge-legit { background: var(--green-light); color: var(--green); border-color: #b5e2c9; }
+.badge-neutral { background: var(--grey); color: var(--muted); border-color: var(--border); }
+.badge-blue { background: var(--blue-light); color: var(--blue-dark); border-color: #c4d7f3; }
+
+.explain-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.explain-row:last-child { border-bottom: none; }
+.effect-up { color: var(--red); font-weight: 600; white-space: nowrap; }
+.effect-down { color: var(--green); font-weight: 600; white-space: nowrap; }
+
+.url-item { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+.url-item-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+/* "Results from every algorithm" on the report pages. Built with divs rather
+   than a table so it can stack on a phone without sideways scrolling. */
+.model-table { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.model-row { display: grid; grid-template-columns: minmax(0, 1.6fr) auto minmax(120px, 1fr); gap: 12px; align-items: center;
+  padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.model-row:last-child { border-bottom: none; }
+.model-row-ensemble { background: var(--grey); font-weight: 600; }
+.model-row-selected { box-shadow: inset 4px 0 0 var(--blue); }
+.model-prob { display: flex; flex-direction: column; gap: 4px; font-variant-numeric: tabular-nums; }
+.small-bar { height: 6px; margin-top: 0; max-width: none; }
+.fill-phishing { background: var(--red) !important; }
+.fill-legit { background: var(--green) !important; }
+
+/* Tables (admin) */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--grey); font-weight: 600; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.selected td { background: var(--blue-light); }
+
+.figure { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--white); }
+
+/* Probability bar widths (applied with the |wclass template filter). The CSP
+   blocks inline style="width:..." attributes, so the widths are fixed classes. */
+.w0{width:0} .w5{width:5%} .w10{width:10%} .w15{width:15%} .w20{width:20%} .w25{width:25%} .w30{width:30%} .w35{width:35%} .w40{width:40%} .w45{width:45%} .w50{width:50%} .w55{width:55%} .w60{width:60%} .w65{width:65%} .w70{width:70%} .w75{width:75%} .w80{width:80%} .w85{width:85%} .w90{width:90%} .w95{width:95%} .w100{width:100%}
+
+.subnav { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 22px; }
+
+/* Phones and small tablets: stack the cards and stats, give buttons the full
+   width, so nothing scrolls sideways. */
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  h1 { font-size: 1.5rem; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .kv { grid-template-columns: 1fr; gap: 2px; }
+  .kv dd { margin-bottom: 10px; }
+  .card { padding: 16px; }
+  .actions .btn { width: 100%; }
+  .nav { width: 100%; }
+  .nav a { padding: 8px 10px; }
+  .explain-row { flex-direction: column; gap: 2px; }
+  .model-row { grid-template-columns: 1fr auto; }
+  .model-prob { grid-column: 1 / -1; }
+}

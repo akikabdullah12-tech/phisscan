@@ -1,0 +1,160 @@
+{# Main participant page: live statistics, then three tabs. Every tab is rendered
+   server-side so the page works without JavaScript; main.js only switches them in place. #}
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>PhisScan</h1>
+<p class="lead mt-0">Welcome to PhisScan. This research prototype uses machine learning to analyse website URLs and email messages for potential phishing indicators.</p>
+
+<section aria-labelledby="stats-heading">
+  <h2 id="stats-heading" class="small muted">Application statistics</h2>
+  <div class="grid grid-4">
+    <div class="stat"><div class="stat-label">Total Visitors</div><div class="stat-value">{{ stats.visitors }}</div><div class="small muted">visitor sessions*</div></div>
+    <div class="stat"><div class="stat-label">URL Scans</div><div class="stat-value">{{ stats.url_scans }}</div></div>
+    <div class="stat"><div class="stat-label">Email Scans</div><div class="stat-value">{{ stats.email_scans }}</div></div>
+    <div class="stat"><div class="stat-label">Total Scans</div><div class="stat-value">{{ stats.total_scans }}</div></div>
+  </div>
+  <p class="small muted">* Visitors are counted as anonymous browser sessions, not unique individuals. One person using two browsers counts twice; refreshing a page does not add a visitor.</p>
+</section>
+
+{% set tab = active if active in ('home', 'url', 'email') else 'home' %}
+<div class="tabs" role="tablist">
+  <a href="?tab=home" class="tab {{ 'active' if tab == 'home' }}" data-tab="home" role="tab" aria-selected="{{ 'true' if tab == 'home' else 'false' }}">Overview</a>
+  <a href="?tab=url" class="tab {{ 'active' if tab == 'url' }}" data-tab="url" role="tab" aria-selected="{{ 'true' if tab == 'url' else 'false' }}">URL Detection</a>
+  <a href="?tab=email" class="tab {{ 'active' if tab == 'email' }}" data-tab="email" role="tab" aria-selected="{{ 'true' if tab == 'email' else 'false' }}">Email Detection</a>
+</div>
+
+{# Overview tab #}
+<section id="panel-home" class="tab-panel {{ 'active' if tab == 'home' }}">
+  <div class="grid grid-2">
+    <div class="card">
+      <h2 class="mt-0">URL Phishing Detection</h2>
+      <p>Check a website address. PhisScan analyses the text of the URL only &ndash; the website is never opened.</p>
+      <p class="small">{% if url_ready %}<span class="badge badge-legit">Model ready</span> {{ url_info.model_name }}{% else %}<span class="badge badge-phishing">Not ready</span> The URL model has not been trained.{% endif %}</p>
+      <a class="btn btn-primary" href="?tab=url" data-tab-link="url">Analyse a URL</a>
+    </div>
+    <div class="card">
+      <h2 class="mt-0">Email Phishing Detection</h2>
+      <p>Paste an email message. PhisScan analyses its text and any links it contains &ndash; nothing in the email is opened or run.</p>
+      <p class="small">{% if email_ready %}<span class="badge badge-legit">Model ready</span> {{ email_info.model_name }}{% else %}<span class="badge badge-phishing">Not ready</span> The email model has not been trained.{% endif %}</p>
+      <a class="btn btn-primary" href="?tab=email">Analyse an email</a>
+    </div>
+  </div>
+  <div class="section-grey">
+    <strong>When you have finished trying the examples</strong>, you can end your session.
+    <div class="actions"><a class="btn btn-secondary" href="{{ url_for('participant.debrief') }}">Finish Session</a>
+    <a class="btn btn-secondary" href="{{ url_for('participant.awareness') }}">Security Awareness tips</a></div>
+  </div>
+</section>
+
+{# URL tab. On a validation error the route re-renders this page with url_error and the user's input. #}
+<section id="panel-url" class="tab-panel {{ 'active' if tab == 'url' }}" aria-labelledby="url-heading">
+  <div class="card">
+    <h2 id="url-heading" class="mt-0">URL Phishing Detection</h2>
+    <p>Enter a website URL to analyse its characteristics using a trained machine learning model. PhisScan will classify the URL as potentially phishing or legitimate and provide relevant security information.</p>
+    {% if not url_ready %}
+      <div class="alert alert-warning">The URL detection feature is not ready: no trained model is available. The researcher needs to run <span class="code">python -m ml.train_url_models</span>.</div>
+    {% endif %}
+    <form method="post" action="{{ url_for('detection.scan_url') }}" data-once novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="url-input">Website URL</label>
+      <input type="text" id="url-input" name="url" placeholder="https://example.com" maxlength="2048" autocomplete="off" spellcheck="false"
+             inputmode="url" value="{{ url_value|default('') }}" class="{{ 'input-error' if url_error }}" required
+             aria-describedby="url-help{% if url_error %} url-err{% endif %}">
+      {% if url_error %}<div class="field-error" id="url-err" role="alert">{{ url_error }}</div>{% endif %}
+      <p class="hint" id="url-help">Only http:// and https:// addresses are supported (maximum 2,048 characters). The address is treated as text and never visited.</p>
+      <div class="actions"><button type="submit" class="btn btn-primary" data-busy="Analysing…" {{ 'disabled' if not url_ready }}>Analyse URL</button></div>
+    </form>
+    <h3>Simulated examples</h3>
+    <p class="small muted">Click an example to fill in the box. These are made-up test addresses &ndash; please do not visit them.</p>
+    <div class="examples">
+      <button type="button" class="btn btn-secondary btn-sm" data-example-url="http://paypa1-account-verify.secure-login.xyz/update">Look-alike payment site</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-example-url="http://192.168.45.10/bank/login.php">IP-address login page</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-example-url="https://microsoft-account-unlock-support.web.app/">Free-hosted account page</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-example-url="https://www.abertay.ac.uk/">University website</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-example-url="https://accounts.google.com/signin">Official sign-in page</button>
+    </div>
+  </div>
+</section>
+
+{# Email tab. The example emails sit in hidden textareas so any HTML in them stays
+   plain text and is never parsed by the browser. #}
+<section id="panel-email" class="tab-panel {{ 'active' if tab == 'email' }}" aria-labelledby="email-heading">
+  <div class="card">
+    <h2 id="email-heading" class="mt-0">Email Phishing Detection</h2>
+    <p>Paste an email message below to analyse its content for phishing characteristics. PhisScan uses machine learning and natural language processing to identify suspicious patterns and provide cybersecurity guidance.</p>
+    {% if not email_ready %}
+      <div class="alert alert-warning">The email detection feature is not ready: no trained model is available. The researcher needs to run <span class="code">python -m ml.train_email_models</span>.</div>
+    {% endif %}
+    {% set ev = email_values|default({}) %}
+    <form method="post" action="{{ url_for('detection.scan_email') }}" data-once novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% if email_error %}<div class="alert alert-danger" role="alert">{{ email_error }}</div>{% endif %}
+      <div class="grid grid-2">
+        <div>
+          <label for="email-subject">Email Subject <span class="hint">(optional)</span></label>
+          <input type="text" id="email-subject" name="subject" maxlength="300" autocomplete="off" value="{{ ev.subject|default('') }}">
+        </div>
+        <div>
+          <label for="email-sender">Sender Email <span class="hint">(optional)</span></label>
+          <input type="text" id="email-sender" name="sender" maxlength="320" autocomplete="off" spellcheck="false" placeholder="name@example.com" value="{{ ev.sender|default('') }}">
+        </div>
+      </div>
+      <label for="email-body">Email Message <span class="hint">(required)</span></label>
+      <textarea id="email-body" name="body" maxlength="50000" placeholder="Paste the email message here..." required>{{ ev.body|default('') }}</textarea>
+      <p class="hint">Plain text or HTML. HTML, scripts and links are never rendered, run or opened. Please remove any personal information before pasting.</p>
+      <div class="actions"><button type="submit" class="btn btn-primary" data-busy="Analysing…" {{ 'disabled' if not email_ready }}>Analyse Email</button></div>
+    </form>
+    <h3>Simulated examples</h3>
+    <p class="small muted">Click an example to fill in the form. These messages are fictional.</p>
+    <div class="examples">
+      <button type="button" class="btn btn-secondary btn-sm" data-example-email="ex-phish-bank">Account suspension notice</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-example-email="ex-phish-prize">Prize notification</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-example-email="ex-legit-meeting">Team meeting email</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-example-email="ex-legit-library">Library reminder</button>
+    </div>
+    <textarea hidden id="ex-phish-bank" data-subject="URGENT: Your account will be suspended" data-sender="security-team@secure-bank-alerts24.com">Dear Customer,
+
+We have detected unusual activity on your online banking account. For your protection, access has been temporarily restricted.
+
+You must verify your account within 24 hours or it will be permanently suspended. Please confirm your details, including your card number and password, using the secure link below:
+
+<a href="http://secure-bank-alerts24.com.verify-session.top/login">https://www.yourbank.co.uk/security</a>
+
+Failure to respond immediately will result in your account being closed.
+
+Online Security Department</textarea>
+    <textarea hidden id="ex-phish-prize" data-subject="Congratulations! You have won a £1,000 gift card" data-sender="Rewards Team <rewards.promo2026@gmail.com>">Congratulations!
+
+You have been selected to receive a £1,000 gift card as part of our annual customer reward programme. You are one of only 10 winners.
+
+To claim your prize, simply click the link below and enter your details before the offer expires today:
+
+http://bit.ly/claim-reward-now
+
+Limited time offer. Act now to avoid losing your reward!</textarea>
+    <textarea hidden id="ex-legit-meeting" data-subject="Notes from Tuesday's project meeting" data-sender="j.smith@example.ac.uk">Hi all,
+
+Thanks for coming to Tuesday's project meeting. A quick summary of what we agreed:
+
+- Sam will finish the literature review draft by the end of next week.
+- The evaluation chapter will use the results from the second experiment.
+- Our next meeting is on Thursday at 2pm in room 4.12.
+
+Let me know if I missed anything or if the time doesn't work for you.
+
+Best wishes,
+Jo</textarea>
+    <textarea hidden id="ex-legit-library" data-subject="Library loan reminder" data-sender="library@example.ac.uk">Hello,
+
+This is a reminder that the following item is due back on 14 November:
+
+  Introduction to Information Security (3rd edition)
+
+You can renew it once through your library account if no one else has requested it. If you have already returned the item, please ignore this message.
+
+Kind regards,
+Library Services</textarea>
+  </div>
+</section>
+{% endblock %}

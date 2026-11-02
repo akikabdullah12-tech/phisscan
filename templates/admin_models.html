@@ -1,0 +1,76 @@
+{# Every number on this page is read from research_outputs/model_evaluation/*.json,
+   written by the training scripts. Nothing here is typed in by hand. #}
+{% extends "_admin_base.html" %}
+{% block title %}Model performance{% endblock %}
+{% macro results_block(res, title, prefix, deployed_info) %}
+<div class="card">
+  <h2 class="mt-0">{{ title }}</h2>
+  {% if not res %}
+    <div class="alert alert-warning mb-0">No evaluation results found. Run the training script to generate them.</div>
+  {% else %}
+    <dl class="kv small">
+      <dt>Selected model</dt><dd><strong>{{ res.selected_model }}</strong> <span class="muted">({{ res.model_version }})</span></dd>
+      {% if deployed_info is not none %}<dt>Deployed in the app</dt><dd>{% if deployed_info %}{{ deployed_info.model_name }} ({{ deployed_info.model_version }}){% else %}<span class="badge badge-phishing">No deployed model</span>{% endif %}</dd>{% endif %}
+      <dt>Trained</dt><dd>{{ res.trained_at }}{% if res.quick_mode %} &middot; <span class="badge badge-phishing">quick test mode</span>{% endif %}</dd>
+      <dt>Dataset</dt><dd>{{ res.dataset.file }} &ndash; {{ '{:,}'.format(res.dataset.rows_after_cleaning) }} rows after cleaning
+        ({{ '{:,}'.format(res.dataset.phishing_rows) }} phishing / {{ '{:,}'.format(res.dataset.legitimate_rows) }} legitimate)</dd>
+      <dt>Split</dt><dd>{{ '{:,}'.format(res.split.train) }} train / {{ '{:,}'.format(res.split.test) }} test (stratified), {{ res.split.cv_folds }}-fold CV on training data{% if res.split.cv_tuning_sample %} (tuning sample {{ '{:,}'.format(res.split.cv_tuning_sample) }}){% endif %}</dd>
+      {% if res.feature_set %}<dt>Feature set</dt><dd>{{ res.feature_set }} ({{ res.feature_names|length }} features)</dd>{% endif %}
+      {% if res.vectorizer %}<dt>Text features</dt><dd>TF-IDF, {{ '{:,}'.format(res.vectorizer.vocabulary_size) }} terms, n-grams {{ res.vectorizer.ngram_range|join('&ndash;')|safe }}</dd>{% endif %}
+      <dt>Selection rule</dt><dd>{{ res.selection_rule }}</dd>
+      {% if res.skipped_models %}<dt>Skipped</dt><dd>{{ res.skipped_models|join(', ') }}</dd>{% endif %}
+    </dl>
+    <h3>Test-set results</h3>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Model</th><th class="num">Accuracy</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th><th class="num">ROC-AUC</th><th class="num">PR-AUC</th><th class="num">FPR</th><th class="num">CV F1</th><th class="num">CV FPR</th><th>Confusion [TN FP / FN TP]</th></tr></thead>
+      <tbody>
+      {% for m in res.models %}
+        <tr class="{{ 'selected' if m.model == res.selected_model }}">
+          <td>{{ m.model }}{% if m.model == res.selected_model %} <span class="badge badge-blue">selected</span>{% endif %}</td>
+          <td class="num">{{ '%.3f'|format(m.accuracy) }}</td><td class="num">{{ '%.3f'|format(m.precision) }}</td>
+          <td class="num">{{ '%.3f'|format(m.recall) }}</td><td class="num">{{ '%.3f'|format(m.f1) }}</td>
+          <td class="num">{{ '%.3f'|format(m.roc_auc) if m.roc_auc is defined else '-' }}</td><td class="num">{{ '%.3f'|format(m.pr_auc) if m.pr_auc is defined else '-' }}</td>
+          <td class="num">{{ '%.3f'|format(m.false_positive_rate) }}</td>
+          <td class="num">{{ '%.3f'|format(m.cv_f1_mean) }} &plusmn; {{ '%.3f'|format(m.cv_f1_std) }}</td>
+          <td class="num">{{ '%.3f'|format(m.cv_fpr_mean) }}</td>
+          <td class="small">{{ m.confusion_matrix[0]|join(' ') }} / {{ m.confusion_matrix[1]|join(' ') }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% if res.plots %}
+    <h3>Charts</h3>
+    <div class="grid grid-2">
+      {% for p in res.plots %}<a href="{{ url_for('admin.evaluation_file', filename=p) }}"><img class="figure" src="{{ url_for('admin.evaluation_file', filename=p) }}" alt="{{ p.replace('_', ' ').replace('.png', '') }}"></a>{% endfor %}
+    </div>
+    {% endif %}
+    {% if res.selected_feature_importance %}
+    <h3>Feature importance of the selected model</h3>
+    <div class="table-wrap"><table><tbody>
+      {% for k, v in res.selected_feature_importance|dictsort(by='value', reverse=true) %}<tr><td>{{ k }}</td><td class="num">{{ '%.4f'|format(v) }}</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% endif %}
+    {% if res.top_phishing_terms %}
+    <h3>Terms most associated with phishing (selected model)</h3>
+    <div class="examples">{% for t in res.top_phishing_terms %}<span class="badge badge-blue">{{ t.term }}</span>{% endfor %}</div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% block content %}
+<h1>Model Performance</h1>
+<p class="muted">All values are read from the evaluation files produced by the training scripts (<span class="code">research_outputs/model_evaluation/</span>). Model selection used cross-validation on training data; the test set was used once for the results below.</p>
+
+{{ results_block(url_results, "URL models (deployed: registered-domain features)", "url", url_info) }}
+{{ results_block(email_results, "Email models (TF-IDF)", "email", email_info) }}
+
+<div class="alert alert-info">
+  <strong>Dataset artefact experiment.</strong> In PhiUSIIL every legitimate URL is a bare <span class="code">https://www.</span> homepage, so whole-URL features
+  (path, HTTPS, "www") separate the classes almost perfectly without learning genuine phishing characteristics. The experiment below quantifies this and is
+  <em>not</em> deployed. Run <span class="code">python -m ml.train_url_models --feature-set full</span> to reproduce it.
+</div>
+{{ results_block(url_full, "URL models: full-URL feature experiment (not deployed)", "url_full", none) }}
+{% endblock %}

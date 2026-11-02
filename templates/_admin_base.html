@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block nav %}
+<nav class="nav" aria-label="Administrator">
+  <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if page == 'overview' }}">Overview</a>
+  <a href="{{ url_for('admin.model_results') }}" class="{{ 'active' if page == 'models' }}">Model Performance</a>
+  <form method="post" action="{{ url_for('admin.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn-link" type="submit">Log out</button></form>
+</nav>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Security awareness{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<h1>Security Awareness</h1>
+<p class="lead">Practical ways to recognise phishing, whatever a tool says.</p>
+
+<div class="card">
+  <h2 class="mt-0">Checking a link</h2>
+  <ul>
+    <li><strong>Read the domain from right to left.</strong> In <span class="code">paypal.com.account-check.xyz</span> the real domain is <span class="code">account-check.xyz</span>, not PayPal.</li>
+    <li><strong>Watch for look-alikes</strong> such as <span class="code">paypa1</span>, <span class="code">rnicrosoft</span> or extra words like <span class="code">-secure-login</span>.</li>
+    <li><strong>Be wary of raw IP addresses</strong>, URL shorteners and long, random-looking addresses.</li>
+    <li><strong>HTTPS (the padlock) only means the connection is encrypted</strong> &ndash; phishing sites use it too.</li>
+    <li><strong>Hover before you click</strong> to see where a link really goes.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2 class="mt-0">Checking an email</h2>
+  <ul>
+    <li><strong>Urgency and threats</strong> ("within 24 hours", "account suspended") are designed to stop you thinking.</li>
+    <li><strong>Requests for passwords, PINs or card numbers</strong> are a red flag &ndash; genuine organisations do not ask for these by email.</li>
+    <li><strong>Check the full sender address</strong>, not just the display name.</li>
+    <li><strong>Generic greetings</strong> such as "Dear Customer" can indicate a mass phishing campaign.</li>
+    <li><strong>Unexpected attachments or prizes</strong> deserve extra caution.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2 class="mt-0">If you are unsure</h2>
+  <ul>
+    <li>Contact the organisation using details you already trust (their official website or app, or the number on your card).</li>
+    <li>Do not reply, click links or open attachments in the suspicious message.</li>
+    <li>In the UK, forward suspicious emails to <span class="code">report@phishing.gov.uk</span> and suspicious texts to <span class="code">7726</span>.</li>
+    <li>If you entered details on a suspicious site, change your password straight away and contact your bank if payment details were involved.</li>
+  </ul>
+</div>
+
+<div class="section-grey small">
+  <strong>About PhisScan's predictions:</strong> machine learning models learn patterns from past examples and can be wrong in both directions.
+  Use the results as one input to your judgement, not as a guarantee.
+</div>
+<div class="actions"><a class="btn btn-secondary" href="{{ url_for('detection.dashboard') }}">Back to Homepage</a></div>
+{% endblock %}

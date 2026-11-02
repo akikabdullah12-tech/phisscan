@@ -1,0 +1,60 @@
+{% extends "_admin_base.html" %}
+{% block title %}Administrator dashboard{% endblock %}
+{% block content %}
+<h1>Administrator Dashboard</h1>
+
+<div class="grid grid-3">
+  <div class="stat"><div class="stat-label">Total Visitor Sessions</div><div class="stat-value">{{ stats.visitors }}</div></div>
+  <div class="stat"><div class="stat-label">Total Consent Records</div><div class="stat-value">{{ stats.consents }}</div></div>
+  <div class="stat"><div class="stat-label">Total URL Scans</div><div class="stat-value">{{ stats.url_scans }}</div><div class="small muted">{{ stats.url_phishing }} classified phishing</div></div>
+  <div class="stat"><div class="stat-label">Total Email Scans</div><div class="stat-value">{{ stats.email_scans }}</div><div class="small muted">{{ stats.email_phishing }} classified phishing</div></div>
+  <div class="stat"><div class="stat-label">Completed Research Sessions</div><div class="stat-value">{{ stats.completed_sessions }}</div><div class="small muted">{{ stats.declined_sessions }} declined</div></div>
+</div>
+<p class="small muted">Visitor sessions are anonymous browser sessions, not unique individuals.</p>
+
+<h2>Participant Activity</h2>
+<form method="get" class="inline-form" role="search">
+  <div><label for="participant" class="small">Filter by participant ID</label>
+  <input type="search" id="participant" name="participant" value="{{ filter_value }}" maxlength="20" placeholder="e.g. PASV1001"></div>
+  <button class="btn btn-secondary" type="submit">Filter</button>
+  {% if filter_value %}<a class="btn btn-link" href="{{ url_for('admin.dashboard') }}">Clear</a>{% endif %}
+</form>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Participant ID</th><th>Consent</th><th>Consent time (UTC)</th><th class="num">URL Scans</th><th class="num">Email Scans</th><th>Status</th><th>Withdrawal</th></tr></thead>
+  <tbody>
+  {% for p in participants %}
+    <tr>
+      <td><span class="code">{{ p.participant_id }}</span></td>
+      <td>{{ 'Yes' if p.consent_status == 'given' else 'No' }}</td>
+      <td class="small">{{ p.consent_timestamp }}</td>
+      <td class="num">{{ p.url_scans }}</td>
+      <td class="num">{{ p.email_scans }}</td>
+      <td><span class="badge {{ 'badge-legit' if p.research_status == 'completed' else 'badge-blue' }}">{{ 'Finished' if p.research_status == 'completed' else 'Active' }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('admin.delete_participant', participant_id=p.participant_id) }}" data-confirm="Permanently delete all records for {{ p.participant_id }}? This cannot be undone.">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">No participants yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2>Data retention</h2>
+<div class="card">
+  {% if retention_days > 0 %}
+    <p class="small">Configured retention period: <strong>{{ retention_days }} days</strong>.</p>
+    <form method="post" action="{{ url_for('admin.apply_retention') }}" data-confirm="Delete all participant records older than {{ retention_days }} days?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-danger btn-sm" type="submit">Apply retention policy now</button>
+    </form>
+  {% else %}
+    <p class="small muted">No retention period configured. Set <span class="code">DATA_RETENTION_DAYS</span> in <span class="code">.env</span> according to the approved research documents.</p>
+  {% endif %}
+</div>
+{% endblock %}
